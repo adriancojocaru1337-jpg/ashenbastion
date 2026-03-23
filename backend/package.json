@@ -1,0 +1,20 @@
+{
+  "name": "ashenbastion-backend",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev:express": "node src/server.express.js",
+    "dev:fastify": "node src/server.fastify.js",
+    "migrate": "node src/db/migrate.js"
+  },
+  "dependencies": {
+    "@fastify/cors": "^10.0.1",
+    "axios": "^1.7.7",
+    "cors": "^2.8.5",
+    "express": "^4.21.1",
+    "fastify": "^5.0.0",
+    "pg": "^8.13.0",
+    "zod": "^3.23.8"
+  }
+}
