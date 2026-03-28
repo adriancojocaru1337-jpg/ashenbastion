@@ -1,4 +1,6 @@
 import apiClient from '@/lib/apiClient';
+import { USE_MOCKS } from '@/lib/mockMode';
+import { bastionMock } from '../data/bastionMock';
 
 function normalizeBuilding(building) {
   return {
@@ -15,7 +17,41 @@ function normalizeBuilding(building) {
   };
 }
 
+function getMockBundle() {
+  return {
+    bastion: {
+      id: 'mock-bastion',
+      name: bastionMock.bastion.name,
+      doctrine: bastionMock.bastion.doctrine,
+      title: bastionMock.bastion.title,
+      tutorial: bastionMock.bastion.tutorial,
+      queues: {
+        building: bastionMock.bastion.queues?.building || null,
+        training: bastionMock.bastion.queues?.training || [],
+      },
+      troopSummary: bastionMock.bastion.troopSummary || [],
+      resources: { timber: 500, iron: 500, grain: 400, ember: 100 },
+      resourceRates: { timber: 60, iron: 50, grain: 55, ember: 4 },
+    },
+    buildings: (bastionMock.buildings || []).map((building) => ({
+      type: building.type,
+      name: building.name,
+      category: building.category || 'core',
+      level: building.level,
+      currentEffect: building.currentEffect,
+      nextEffect: building.nextEffect,
+      upgradeCost: building.upgradeCost,
+      upgradeTimeSeconds: building.upgradeTimeSeconds || null,
+      upgradeTime: building.upgradeTime || null,
+      canUpgrade: building.canUpgrade,
+      lockedReason: building.lockedReason || null,
+    })),
+  };
+}
+
 export async function getBastionBundle() {
+  if (USE_MOCKS) return getMockBundle();
+
   const { data } = await apiClient.get('/bastion');
   const payload = data.data;
   return {
@@ -45,11 +81,17 @@ export async function getBastionBundle() {
 }
 
 export async function upgradeBuilding({ buildingType }) {
+  if (USE_MOCKS) {
+    return { success: true, message: `${buildingType} queued for upgrade in demo mode.` };
+  }
   const { data } = await apiClient.post('/bastion/buildings/upgrade', { buildingType });
   return data.data;
 }
 
 export async function trainTroops({ troopType, quantity }) {
+  if (USE_MOCKS) {
+    return { success: true, message: `Queued ${quantity} ${troopType} in demo mode.` };
+  }
   const { data } = await apiClient.post('/bastion/troops/train', { troopType, quantity });
   return data.data;
 }
